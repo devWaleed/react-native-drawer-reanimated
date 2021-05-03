@@ -13,64 +13,66 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+
 export default function Drawer(props) {
-  const { width, height } = Dimensions.get('window');
-
-  const drawerWidth = width * 0.8;
-
-  const x = useSharedValue(0);
-  const y = useSharedValue(0);
+  const drawerWidth = props.width;
+  const translationX = useSharedValue(0);
   const isOpen = useSharedValue(false);
 
   const gestureHandler = useAnimatedGestureHandler({
     onStart: (event, ctx) => {
-      ctx.startX = x.value;
+      ctx.startX = translationX.value;
       ctx.absoluteStartX = event.absoluteX;
     },
     onActive: (event, ctx) => {
       if (!isOpen.value) {
-        if (ctx.absoluteStartX > 20) {
+        if (ctx.absoluteStartX > props.dragStartThreshold) {
           return;
         }
       }
 
       isOpen.value =
-        x.value == drawerWidth ? true : x.value == 0 ? false : true;
+        translationX.value == drawerWidth
+          ? true
+          : translationX.value == 0
+          ? false
+          : true;
 
       var totalTranslation = ctx.startX + event.translationX;
 
       if (totalTranslation < drawerWidth) {
-        x.value = totalTranslation;
+        translationX.value = totalTranslation;
       } else {
-        x.value = drawerWidth;
+        translationX.value = drawerWidth;
       }
     },
     onEnd: (event, context) => {
       if (event.velocityX > 0) {
         if (event.velocityX > 1000) {
-          x.value = withTiming(drawerWidth, {
+          translationX.value = withTiming(drawerWidth, {
             easing: Easing.bezier(0.25, 0.1, 0.25, 1),
           });
           isOpen.value = true;
           return;
         }
 
-        if (x.value > drawerWidth * 0.4) {
-          x.value = withTiming(drawerWidth, {
+        if (translationX.value > drawerWidth * props.minimumOpenThreshold) {
+          translationX.value = withTiming(drawerWidth, {
             easing: Easing.bezier(0.25, 0.1, 0.25, 1),
           });
         } else {
-          x.value = withTiming(0, {
+          translationX.value = withTiming(0, {
             easing: Easing.bezier(0.25, 0.1, 0.25, 1),
           });
         }
       } else {
-        if (x.value < drawerWidth * 0.8) {
-          x.value = withTiming(0, {
+        if (translationX.value < drawerWidth * props.minimumCloseThreshold) {
+          translationX.value = withTiming(0, {
             easing: Easing.bezier(0.25, 0.1, 0.25, 1),
           });
         } else {
-          x.value = withTiming(drawerWidth, {
+          translationX.value = withTiming(drawerWidth, {
             easing: Easing.bezier(0.25, 0.1, 0.25, 1),
           });
         }
@@ -80,18 +82,22 @@ export default function Drawer(props) {
 
   const drawerAnimatedStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ translateX: x.value }, { translateY: y.value }],
+      transform: [{ translateX: translationX.value }],
     };
   });
 
   const overlayAnimatedStyle = useAnimatedStyle(() => {
     return {
       zIndex: 100,
-      backgroundColor: '#000',
-      width: x.value > 0 ? '100%' : 0,
-      height: x.value > 0 ? height : 0,
+      backgroundColor: props.overlayBackgroundColor,
+      width: translationX.value > 0 ? '100%' : 0,
+      height: translationX.value > 0 ? screenHeight : 0,
       position: 'absolute',
-      opacity: interpolate(x.value, [0, drawerWidth], [0, 0.3]),
+      opacity: interpolate(
+        translationX.value,
+        [0, drawerWidth],
+        [0, props.overlayMaxOpacity],
+      ),
     };
   });
 
@@ -104,7 +110,7 @@ export default function Drawer(props) {
           <TouchableOpacity
             style={{ width: '100%', height: '100%' }}
             onPress={() => {
-              x.value = withTiming(0);
+              translationX.value = withTiming(0);
             }}
           />
         </Animated.View>
@@ -113,12 +119,12 @@ export default function Drawer(props) {
             drawerAnimatedStyle,
             {
               position: 'absolute',
-              left: -290,
+              left: -drawerWidth,
               top: 0,
               bottom: 0,
-              height: height,
+              height: screenHeight,
               width: drawerWidth,
-              zIndex: 100,
+              zIndex: 101,
             },
           ]}>
           {props.content()}
@@ -131,4 +137,10 @@ export default function Drawer(props) {
 
 Drawer.defaultProps = {
   content: () => {},
+  width: screenWidth * 0.8,
+  dragStartThreshold: 20,
+  minimumOpenThreshold: 0.4,
+  minimumCloseThreshold: 0.8,
+  overlayBackgroundColor: '#000',
+  overlayMaxOpacity: 0.3,
 };
