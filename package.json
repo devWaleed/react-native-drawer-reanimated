@@ -1,0 +1,32 @@
+{
+  "name": "react-native-drawer-reanimated",
+  "version": "1.0.1",
+  "description": "A simple react native drawer component",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devWaleed/react-native-drawer-reanimated.git"
+  },
+  "keywords": [
+    "react-native",
+    "component",
+    "drawer",
+    "reanimated"
+  ],
+  "author": "devWaleed",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/devWaleed/react-native-drawer-reanimated/issues"
+  },
+  "homepage": "https://github.com/devWaleed/react-native-drawer-reanimated#readme",
+  "dependencies": {
+    "react": "16.13.1",
+    "react-native": "0.63.4",
+    "react-native-reanimated": "^2.0.0",
+    "react-native-gesture-handler": "^1.9.0"
+  },
+  "devDependencies": {}
+}
