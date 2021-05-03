@@ -22,10 +22,14 @@ export default function Drawer(props) {
 
   const gestureHandler = useAnimatedGestureHandler({
     onStart: (event, ctx) => {
+      if (!props.enabled) return;
+
       ctx.startX = translationX.value;
       ctx.absoluteStartX = event.absoluteX;
     },
     onActive: (event, ctx) => {
+      if (!props.enabled) return;
+
       if (!isOpen.value) {
         if (ctx.absoluteStartX > props.dragStartThreshold) {
           return;
@@ -48,33 +52,30 @@ export default function Drawer(props) {
       }
     },
     onEnd: (event, context) => {
+      if (!props.enabled) return;
+
+      const timingOptions = {
+        easing: Easing.bezier(0.69, 0.69, 0.69, 0.69),
+        duration: 150,
+      };
+
       if (event.velocityX > 0) {
         if (event.velocityX > 1000) {
-          translationX.value = withTiming(drawerWidth, {
-            easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-          });
+          translationX.value = withTiming(drawerWidth, timingOptions);
           isOpen.value = true;
           return;
         }
 
         if (translationX.value > drawerWidth * props.minimumOpenThreshold) {
-          translationX.value = withTiming(drawerWidth, {
-            easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-          });
+          translationX.value = withTiming(drawerWidth, timingOptions);
         } else {
-          translationX.value = withTiming(0, {
-            easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-          });
+          translationX.value = withTiming(0, timingOptions);
         }
       } else {
         if (translationX.value < drawerWidth * props.minimumCloseThreshold) {
-          translationX.value = withTiming(0, {
-            easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-          });
+          translationX.value = withTiming(0, timingOptions);
         } else {
-          translationX.value = withTiming(drawerWidth, {
-            easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-          });
+          translationX.value = withTiming(drawerWidth, timingOptions);
         }
       }
     },
@@ -142,5 +143,6 @@ Drawer.defaultProps = {
   minimumOpenThreshold: 0.4,
   minimumCloseThreshold: 0.8,
   overlayBackgroundColor: '#000',
-  overlayMaxOpacity: 0.3,
+  overlayMaxOpacity: 0.5,
+  enabled: true,
 };
