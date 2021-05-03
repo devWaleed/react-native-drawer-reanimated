@@ -89,7 +89,7 @@ export default function Drawer(props) {
 
   const overlayAnimatedStyle = useAnimatedStyle(() => {
     return {
-      zIndex: 100,
+      zIndex: 999,
       backgroundColor: props.overlayBackgroundColor,
       width: translationX.value > 0 ? '100%' : 0,
       height: translationX.value > 0 ? screenHeight : 0,
@@ -106,7 +106,7 @@ export default function Drawer(props) {
     <PanGestureHandler
       onGestureEvent={gestureHandler}
       activeOffsetX={[-10, 10]}>
-      <Animated.View>
+      <Animated.View style={{ height: '100%' }}>
         <Animated.View style={[overlayAnimatedStyle]}>
           <TouchableOpacity
             style={{ width: '100%', height: '100%' }}
@@ -125,7 +125,7 @@ export default function Drawer(props) {
               bottom: 0,
               height: screenHeight,
               width: drawerWidth,
-              zIndex: 101,
+              zIndex: 999,
             },
           ]}>
           {props.content()}
