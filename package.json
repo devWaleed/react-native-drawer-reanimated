@@ -1,6 +1,6 @@
 {
   "name": "react-native-drawer-reanimated",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A simple react native drawer component",
   "main": "index.js",
   "scripts": {
